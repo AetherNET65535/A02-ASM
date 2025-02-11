@@ -1,0 +1,38 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build ASM",
+            "type": "shell",
+            "command": "nasm",
+            "args": [
+                "-f",
+                "elf64",
+                "main.asm",
+                "-o",
+                "main.o"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Link ASM",
+            "type": "shell",
+            "command": "ld",
+            "args": [
+                "main.o",
+                "-o",
+                "main"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "Run ASM",
+            "type": "shell",
+            "command": "./main",
+            "group": "test"
+        }
+    ]
+}
