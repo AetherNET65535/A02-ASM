@@ -63,10 +63,10 @@ text_to_number1:
     movzx rax, byte [rsi]
 
     cmp rax, '\n'
-    je return_back
+    je return_text1
 
-    sub number1, '0'
-    imul rax, rax, 10
+    sub rax, '0'
+    imul rbx, rbx, 10
     add rbx, rax
     
     inc rsi
@@ -88,5 +88,5 @@ number_to_text:
 answer:
 
 ;返回（草，怎么cmp ret不行呀）
-return_back:
+return_text1:
     ret
