@@ -1,60 +1,92 @@
-section .data
-    prompt db "请输入数字：", 0xA
-    prompt_len equ $ - prompt
-    finish_msg db "已结束！", 0xA
-    finish_len equ $ - finish_msg
-
 section .bss
-    user_input resb 100   ; 分配100字节的内存，用于存储用户输入
+    number1 resb 100
+    number2 resb 100
+    answer resb 200
 
+section .data
+    number_msg db "请输入正整数：", 0xA
+    number_len equ $ - number_msg
+    
 section .text
     global _start
+    ;函数声明（就是想声明而已，我已经是C的形状了）
+    ;request_number 
+    ;get_number
+    ;text_to_number1
+    ;text_to_number2
+    ;calculator
+    ;to_stack
+    ;number_to_text
+    ;answer
 
 _start:
-    ; 提示用户输入
+    jmp get_number
+
+;索取数字
+request_number:
     mov rax, 1
-    mov rdi, 1
-    mov rsi, prompt
-    mov rdx, prompt_len
+    mov rsi, 1
+    mov rdx, number_msg
+    mov rcx, number_len
     syscall
 
-    ; 读取用户输入
+    ret
+
+;获取数字
+get_number:
+    call request_number
+
     mov rax, 0
-    mov rdi, 0
-    mov rsi, user_input
-    mov rdx, 100
+    mov rsi, 0
+    mov rdx, number1
+    mov rcx, 100
     syscall
 
-    ; 计算（转换字符串为数字，加1）
-    mov rsi, user_input         ; rsi 指向 user_input
-    xor rbx, rbx                ; 清空 rbx（将其用作存储数字）
+    mov rsi, number1
+    xor rbx, rbx
+    call text_to_number1
+    
+    call request_number
 
-convert_loop:
-    movzx rax, byte[rsi]               ; 将当前字符加载到 rax
-    test rax, rax                 ; 检查是否是字符串结束符（0x0A）
-    jz done_convert             ; 如果是 0x0A（换行符），结束转换
-
-    sub rax, '0'                 ; 将字符转换为数字（'0' -> 0, '1' -> 1, ..., '9' -> 9）
-    imul rbx, rbx, 10           ; 将现有数字乘以 10
-    add rbx, rax                 ; 加上当前的数字
-
-    inc rsi                     ; 移动到下一个字符
-    jmp convert_loop            ; 继续转换
-
-done_convert:
-    add rbx, 1                 ; 加1（例如：65535 -> 65536）
-
-    ; 输出计算结果
-    mov rsi, rbx               ; 将结果存入 rsi（输出结果）
-    ; 这里可以将 rsi 转回字符串输出（需要进一步实现）
-
-    ; 结束
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, finish_msg
-    mov rdx, finish_len
+    mov rax, 0
+    mov rsi, 0
+    mov rdx, number2
+    mov rcx, 100
     syscall
+    
+    mov rsi, number2
+    xor rbx, rbx
+    call text_to_number2
 
-    mov rax, 60
-    xor rdi, rdi
-    syscall
+;字符转数字
+text_to_number1:
+    movzx rax, byte [rsi]
+
+    cmp rax, '\n'
+    je return_back
+
+    sub number1, '0'
+    imul rax, rax, 10
+    add rbx, rax
+    
+    inc rsi
+    jmp text_to_number1
+
+;字符转数字
+text_to_number2:
+
+;计算函数
+calculator:
+
+;把字符放进栈
+to_stack:
+
+;数字转字符
+number_to_text:
+
+;答案输出
+answer:
+
+;返回（草，怎么cmp ret不行呀）
+return_back:
+    ret
