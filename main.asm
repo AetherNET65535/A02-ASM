@@ -1,7 +1,7 @@
 section .bss
     number1 resb 100
     number2 resb 100
-    answer resb 200
+    total resb 200
 
 section .data
     number_msg db "请输入正整数：", 0xA
@@ -25,9 +25,9 @@ _start:
 ;索取数字
 request_number:
     mov rax, 1
-    mov rsi, 1
-    mov rdx, number_msg
-    mov rcx, number_len
+    mov rdi, 1
+    mov rsi, number_msg
+    mov rdx, number_len
     syscall
 
     ret
@@ -37,9 +37,9 @@ get_number:
     call request_number
 
     mov rax, 0
-    mov rsi, 0
-    mov rdx, number1
-    mov rcx, 100
+    mov rdi, 0
+    mov rsi, number1
+    mov rdx, 100
     syscall
 
     mov rsi, number1
@@ -49,14 +49,16 @@ get_number:
     call request_number
 
     mov rax, 0
-    mov rsi, 0
-    mov rdx, number2
-    mov rcx, 100
+    mov rdi, 0
+    mov rsi, number2
+    mov rdx, 100
     syscall
     
     mov rsi, number2
     xor rbx, rbx
     call text_to_number2
+    
+    jmp calculator
 
 ;字符转数字
 text_to_number1:
@@ -74,12 +76,44 @@ text_to_number1:
 
 ;字符转数字
 text_to_number2:
+    movzx rax, byte [rsi]
+
+    cmp rax, '\n'
+    je return_text2
+
+    sub rax, '0'
+    imul rbx, rbx, 10
+    add rbx, rax
+    
+    inc rsi
+    jmp text_to_number2
 
 ;计算函数
 calculator:
+    mov rax, [number1]
+    add rax, [number2]
+    mov [total], rax
+    
+    jmp to_stack
 
 ;把字符放进栈
 to_stack:
+    mov rbx, [total] ;可能是有点傻逼的行为，不过汇编已经帮我省很多性能了，我霍霍点吧
+    
+    mov rax, [total]
+    cmp rax, 0
+    je xxx ;等下再写
+    
+    mov rax, [total] ;AX
+    mov rcx, 10      ;除以CX
+
+    xor rdx, rdx
+    div rcx          ;RAX = 商，RDX = 余
+    
+    mov [total], rax
+
+    push rdx
+    jmp to_stack
 
 ;数字转字符
 number_to_text:
@@ -89,4 +123,9 @@ answer:
 
 ;返回（草，怎么cmp ret不行呀）
 return_text1:
+    mov [number1], rbx
+    ret
+
+return_text2:
+    mov [number2], rbx
     ret
