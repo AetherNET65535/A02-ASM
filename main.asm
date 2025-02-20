@@ -102,7 +102,7 @@ to_stack:
     
     mov rax, [total]
     cmp rax, 0
-    je xxx ;等下再写
+    je number_to_text
     
     mov rax, [total] ;AX
     mov rcx, 10      ;除以CX
@@ -117,9 +117,26 @@ to_stack:
 
 ;数字转字符
 number_to_text:
+    mov rsi, total
+    jmp convert_loop ;可有可无，让电脑知道我写的代码不是给他干闲活的
+
+;NTT的子函数
+convert_loop:
+    pop rax
+    add rax, '0'
+    mov [rsi], al
+    inc rsi
+
+    cmp rsp, rbp
+    jne convert_loop
+    
+    mov byte [rsi], 0
+    
+    jmp answer
 
 ;答案输出
 answer:
+    
 
 ;返回（草，怎么cmp ret不行呀）
 return_text1:
