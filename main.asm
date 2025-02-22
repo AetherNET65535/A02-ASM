@@ -28,7 +28,7 @@ display_prompt:
     mov rax, 1                  ; sys_write系统调用号
     mov rdi, 1                  ; 标准输出文件描述符
     mov rsi, input_prompt       ; 提示信息的地址
-    mov rdx, input_len         ; 提示信息的长度
+    mov rdx, input_len          ; 提示信息的长度
     syscall
     ret
 
