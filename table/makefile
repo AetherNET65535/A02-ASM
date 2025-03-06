@@ -1,12 +1,8 @@
-boot: boot.o
-	ld boot.o -o boot
-
-boot.o: boot.asm
+all:
 	nasm -f bin boot.asm -o boot.bin
 
-run: boot
-	./boot
+run: all
+	qemu-system-x86_64 -drive format=raw,file=boot.bin
 
 clean:
-	rm -f boot.o boot
-
+	rm -f boot.bin
