@@ -5,50 +5,28 @@ start:
     mov ah, 0x00
     int 0x16   ; 读取按键
 
-    mov dl, al  ; AL = ASCII 码
-    call print_hex
+    ; 检查是否是 Backspace（0x7F）
+    cmp al, 0x7F
+    je handle_backspace
 
-    mov dl, ah  ; AH = 扫描码
-    call print_hex
-
-    mov al, ' '  ; 空格分隔
+    ; 正常字符显示
     mov ah, 0x0E
     int 0x10
+    jmp start
 
-    jmp start  ; 继续读取输入
-
-; 把 DL 转换成十六进制并打印
-print_hex:
-    push ax
-    push bx
-
-    mov bl, dl  ; 备份 DL
-    shr bl, 4   ; 取高 4 位
-    call print_digit
-
-    mov bl, dl  ; 取低 4 位
-    and bl, 0x0F
-    call print_digit
-
-    mov al, ' '
+handle_backspace:
+    ; 退格处理三步曲：
     mov ah, 0x0E
+    mov al, 0x08  ; 1. 光标左移
     int 0x10
 
-    pop bx
-    pop ax
-    ret
-
-print_digit:
-    add bl, '0'
-    cmp bl, '9'
-    jbe print_ok
-    add bl, 7   ; 'A'-'F' 需要偏移
-
-print_ok:
-    mov al, bl
-    mov ah, 0x0E
+    mov al, ' '   ; 2. 覆盖字符
     int 0x10
-    ret
+
+    mov al, 0x08  ; 3. 再次左移光标
+    int 0x10
+
+    jmp start
 
 times 510-($-$$) db 0
 dw 0xAA55
