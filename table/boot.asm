@@ -1,29 +1,13 @@
 [bits 16]
-org 0x7C00  
+org 0x7C00  ; 传统 BIOS 启动扇区地址
 
 start:
-    mov ah, 0x00   ; BIOS 读取键盘输入
-    int 0x16       ; AL = ASCII 码
+    mov ah, 0x00   ; 读取按键
+    int 0x16       ; BIOS 键盘输入中断
+    mov ah, 0x0E   ; 让 BIOS 在屏幕上显示字符
+    int 0x10       ; 显示 AL 里的字符
 
-print:
-    mov ah, 0x0E   ; BIOS 显示字符
-    mov bl, al     ; 备份 AL（因为 AL 会被修改）
-
-    mov al, 'H'    ; 显示 "HEX:"
-    int 0x10
-    mov al, 'E'
-    int 0x10
-    mov al, 'X'
-    int 0x10
-    mov al, ':'
-    int 0x10
-
-    mov al, '0' + ((bl >> 4) & 0x0F)  ; 显示高 4 位
-    int 0x10
-    mov al, '0' + (bl & 0x0F)         ; 显示低 4 位
-    int 0x10
-
-    jmp start
+    jmp start      ; 继续读取输入
 
 times 510-($-$$) db 0
-dw 0xAA55  
+dw 0xAA55  ; BIOS 启动标志
